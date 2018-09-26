@@ -2,8 +2,12 @@ package banco;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
@@ -44,16 +48,34 @@ public class LoginWindow extends JFrame {
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
+		contentPane.setLayout(new GridBagLayout());
 		setContentPane(contentPane);
 		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = 0;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.ipadx = 30;
+		c.ipady = 5;
+		c.gridwidth = 2;
+		c.insets = new Insets(5,10,5,10);
+		
 		tfUser = new JTextField();
-		contentPane.add(tfUser, BorderLayout.NORTH);
+		contentPane.add(tfUser, c);
 		tfUser.setColumns(10);
 		
+		c.gridy = 1;
+		
 		tfPassword = new JTextField();
-		contentPane.add(tfPassword, BorderLayout.CENTER);
+		contentPane.add(tfPassword, c);
 		tfPassword.setColumns(10);
+		
+		c.gridy = 2;
+		c.ipadx = 0;
+		c.ipady = 0;
+		c.gridwidth = 1;
+		c.weightx = 0.7;
+		c.insets = new Insets(0,10,0,0);
 		
 		btnOk = new JButton("OK");
 		btnOk.addActionListener(new ActionListener() {
@@ -67,7 +89,11 @@ public class LoginWindow extends JFrame {
 				}
 			}
 		});
-		contentPane.add(btnOk, BorderLayout.SOUTH);
+		contentPane.add(btnOk, c);
+		
+		c.gridx = 1;
+		c.insets = new Insets(0,0,0,10);
+		c.weightx = 0.3;
 		
 		btnDesconectar = new JButton("Desconectar");
 		btnDesconectar.addActionListener(new ActionListener() {
@@ -78,6 +104,6 @@ public class LoginWindow extends JFrame {
 				}
 			}
 		});
-		contentPane.add(btnDesconectar, BorderLayout.EAST);
+		contentPane.add(btnDesconectar, c);
 	}
 }
