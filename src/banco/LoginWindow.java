@@ -8,25 +8,26 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JTextField;
 import javax.swing.JButton;
-import javax.swing.AbstractAction;
+import javax.swing.JDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.WindowEvent;
 
-public class LoginWindow extends JFrame {
+public class LoginWindow extends JDialog {
 
 	private JPanel contentPane;
 	private JCTextField tfUser;
-	private JCTextField tfPassword;
+	private JCPasswordTextField tfPassword;
 	private JButton btnOk;
 	private JButton btnDesconectar;
+	public static Font font = new Font("Segan-Light", Font.PLAIN, 14);
+	public static Font font2 = new Font("Segan-Light", Font.PLAIN, 12);
 
 	/**
 	 * Launch the application.
@@ -50,7 +51,7 @@ public class LoginWindow extends JFrame {
 	public LoginWindow() {
 		this.setTitle("BD Bank");
 		this.setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 300, 220);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -67,7 +68,7 @@ public class LoginWindow extends JFrame {
 		c.gridwidth = 2;
 		c.insets = new Insets(0,15,0,10);
 		JLabel lblLogin = new JLabel("BD Bank - Login");
-		lblLogin.setFont(new Font("Segan-Light", Font.PLAIN, 14));
+		lblLogin.setFont(font);
 		contentPane.add(lblLogin, c);
 		
 		c.gridy = 1;
@@ -94,7 +95,7 @@ public class LoginWindow extends JFrame {
 		
 		c.gridy = 2;
 		
-		tfPassword = new JCTextField();
+		tfPassword = new JCPasswordTextField();
 		contentPane.add(tfPassword, c);
 		tfPassword.setColumns(10);
 		tfPassword.setPlaceholder("Contraseña");
@@ -121,11 +122,18 @@ public class LoginWindow extends JFrame {
 		
 		//Color de boton 153, 167, 255
 		btnOk = new JButton("OK");
+		btnOk.setFont(font2);;
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean b = Connector.getConnection().adminLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
 				if(b) {
-					tfPassword.setText("Conexion exitosa");
+					try {
+						AdminWindow frame = new AdminWindow();
+						frame.setVisible(true);
+						//LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 				else {
 					tfPassword.setText("pone bien la contra imbecil");
@@ -138,13 +146,11 @@ public class LoginWindow extends JFrame {
 		c.insets = new Insets(0,0,0,10);
 		c.weightx = 0.2;
 		
-		btnDesconectar = new JButton("Desconectar");
+		btnDesconectar = new JButton("DESCONECTAR");
+		btnDesconectar.setFont(font2);
 		btnDesconectar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				boolean b = Connector.getConnection().disconnect(LoginWindow.this);
-				if(b) {
-					tfPassword.setText("se desconecto re pillo");
-				}
 			}
 		});
 		contentPane.add(btnDesconectar, c);

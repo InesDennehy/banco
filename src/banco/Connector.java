@@ -1,11 +1,9 @@
 package banco;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Connector {
@@ -19,11 +17,10 @@ public class Connector {
 		return connector;
 	}
 	
-	public boolean adminLogin(JFrame w, String user, String password) {
+	public boolean adminLogin(LoginWindow w, String user, String password) {
 		if(user.equals("admin") && password.equals("admin")) {
 			try{
 				String driver ="com.mysql.cj.jdbc.Driver";
-				System.out.println("compare");
 	        	String server = "localhost:3306";
 	            String database = "banco";
 	            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
@@ -45,7 +42,7 @@ public class Connector {
 		}
 	}
 	
-	public boolean disconnect(JFrame w) {
+	public boolean disconnect(LoginWindow w) {
 		try {
 			if(connection != null)
 				connection.close();

@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class JCTextField extends JTextField{
+public class JCPasswordTextField extends JPasswordField{
 
     private Dimension d = new Dimension(200,32);
     private String placeholder = "";
@@ -16,7 +18,7 @@ public class JCTextField extends JTextField{
     private boolean band = true;
 
     
-    public JCTextField(){
+    public JCPasswordTextField(){
         super();
         setSize(d);
         setFont(LoginWindow.font);
@@ -27,7 +29,7 @@ public class JCTextField extends JTextField{
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                band = (getText().length()>0) ? false:true ;
+                band = (JCPasswordTextField.this.getPassword().length>0) ? false:true ;
             }
 
             @Override
