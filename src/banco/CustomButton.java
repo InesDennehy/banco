@@ -15,17 +15,31 @@ import javax.swing.JLabel;
 import quick.dbtable.DBTable;
 
 
-
 public class CustomButton extends JLabel{
-	public CustomButton(String text, int x, int y) {
+
+	private String mode;
+	public CustomButton(String text, int x, int y,  String m) {
 		super();
 		this.setLayout(new CardLayout());
 		this.setOpaque(false);
-		ImageIcon imageIcon = new ImageIcon("boton.png"); // load the image to a imageIcon
-		Image image = imageIcon.getImage(); // transform it 
-		Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-		imageIcon = new ImageIcon(newimg);  // transform it back
+		this.mode = m;
+		ImageIcon imageIcon = new ImageIcon();
+		if(mode == "normal") {
+			imageIcon = new ImageIcon("boton.png"); // load the image to a imageIcon
+			Image image = imageIcon.getImage(); // transform it 
+			Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+			imageIcon = new ImageIcon(newimg);  // transform it back
+		}
+		else if(mode == "tall") {
+			imageIcon = new ImageIcon("botonTall.png"); // load the image to a imageIcon
+			Image image = imageIcon.getImage(); // transform it 
+			Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+			imageIcon = new ImageIcon(newimg);  // transform it back
+		}
+		
 		this.setIcon(imageIcon);
+		this.setHorizontalAlignment(CENTER);
+		this.setVerticalAlignment(CENTER);
 		JLabel texto = new JLabel(text);
 		texto.setHorizontalAlignment(CENTER);
 		texto.setForeground(Color.white);
@@ -41,42 +55,74 @@ public class CustomButton extends JLabel{
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				ImageIcon imageIcon = new ImageIcon("mouseEntered.png"); // load the image to a imageIcon
-				Image image = imageIcon.getImage(); // transform it 
-				Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-				imageIcon = new ImageIcon(newimg);  // transform it back
-				CustomButton.this.setIcon(imageIcon);
+				if(mode == "normal") {
+					ImageIcon imageIcon = new ImageIcon("mouseEntered.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				} else if (mode == "tall") {
+					ImageIcon imageIcon = new ImageIcon("mouseEnteredTall.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
 			}
 
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				ImageIcon imageIcon = new ImageIcon("boton.png"); // load the image to a imageIcon
-				Image image = imageIcon.getImage(); // transform it 
-				Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-				imageIcon = new ImageIcon(newimg);  // transform it back
-				CustomButton.this.setIcon(imageIcon);	
+				if(mode == "normal") {
+					ImageIcon imageIcon = new ImageIcon("boton.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				} else if (mode == "tall") {
+					ImageIcon imageIcon = new ImageIcon("botonTall.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
 			}
 
 			@Override
 			public void mousePressed(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				ImageIcon imageIcon = new ImageIcon("mousePressed.png"); // load the image to a imageIcon
-				Image image = imageIcon.getImage(); // transform it 
-				Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-				imageIcon = new ImageIcon(newimg);  // transform it back
-				CustomButton.this.setIcon(imageIcon);
+				if(mode == "normal") {
+					ImageIcon imageIcon = new ImageIcon("mousePressed.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				} else if (mode == "tall") {
+					ImageIcon imageIcon = new ImageIcon("mousePressedTall.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
 				
 			}
 
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				ImageIcon imageIcon = new ImageIcon("mouseEntered.png"); // load the image to a imageIcon
-				Image image = imageIcon.getImage(); // transform it 
-				Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
-				imageIcon = new ImageIcon(newimg);  // transform it back
-				CustomButton.this.setIcon(imageIcon);	
+				if(mode == "normal") {
+					ImageIcon imageIcon = new ImageIcon("mouseEntered.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				} else if (mode == "tall") {
+					ImageIcon imageIcon = new ImageIcon("mouseEnteredTall.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
 			}
 		});
 	}

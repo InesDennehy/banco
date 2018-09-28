@@ -10,6 +10,7 @@ import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import quick.dbtable.DBTable;
@@ -23,6 +24,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
 public class LoginWindow extends JDialog {
 
@@ -98,37 +100,19 @@ public class LoginWindow extends JDialog {
 		c.weightx = 0.8;
 		c.insets = new Insets(0,10,0,0);
 		
-		btnOk = new CustomButton("OK", 120,30);
+		btnOk = new CustomButton("OK", 123, 30, "normal");
 		btnOk.setFont(font2);
 		btnOk.addMouseListener(new MouseListener() {
-
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mouseClicked(MouseEvent arg0) {}
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mouseEntered(MouseEvent arg0) {}
 			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mouseExited(MouseEvent arg0) {}
 			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mousePressed(MouseEvent arg0) {}
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				DBTable tabla = Connector.getConnection().adminLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
 				if(tabla != null) {
 					try {
@@ -151,37 +135,19 @@ public class LoginWindow extends JDialog {
 		c.insets = new Insets(0,0,0,10);
 		c.weightx = 0.2;
 		
-		btnDesconectar = new CustomButton("DESCONECTAR",120,30);
+		btnDesconectar = new CustomButton("DESCONECTAR",123,30, "normal");
 		btnDesconectar.addMouseListener(new MouseListener() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mouseClicked(MouseEvent arg0) {}
 			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mouseEntered(MouseEvent arg0) {}
 			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mouseExited(MouseEvent arg0) {}
 			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
+			public void mousePressed(MouseEvent arg0) {}
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
 				boolean b = Connector.getConnection().disconnect(LoginWindow.this);
-				
 			}
 		});
 		contentPane.add(btnDesconectar, c);

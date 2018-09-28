@@ -1,6 +1,7 @@
 package banco;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
@@ -10,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -31,29 +34,30 @@ import quick.dbtable.DBTable;
 public class AdminWindow extends JDialog {
 
 	private JTextArea txtConsulta;
-	private JButton botonBorrar;
-	private JButton btnEjecutar;
+	private CustomButton botonBorrar;
+	private CustomButton btnEjecutar;
 	private DBTable tabla;    
 	private JScrollPane scrConsulta;
-	private JPanel panelConsulta;
 
 	/**
 	 * Create the frame.
 	 */
 	public AdminWindow(DBTable t) {
 		setPreferredSize(new Dimension(800, 600));
+		this.setResizable(false);
         this.setBounds(0, 0, 800, 600);
         setVisible(true);
-        this.setTitle("Admin");
-        getContentPane().setLayout(new BorderLayout());
+        this.setTitle("BD Bank - Admin");
+        getContentPane().setLayout(new GridBagLayout());
+        getContentPane().setBackground(new Color(247, 247, 247));
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setResizable(true);
-
-        panelConsulta = new JPanel(new GridBagLayout());
         
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
+        c.ipadx = 600;
+        c.ipady = 200;
         c.gridheight = 2;
         c.fill = GridBagConstraints.BOTH;
         
@@ -61,43 +65,58 @@ public class AdminWindow extends JDialog {
         txtConsulta = new JTextArea();
         scrConsulta.setViewportView(txtConsulta);
         txtConsulta.setTabSize(3);
-        txtConsulta.setColumns(80);
-        txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
+        txtConsulta.setColumns(30);
         txtConsulta.setText("SELECT legajo FROM Empleado;");
         txtConsulta.setFont(LoginWindow.font);
-        txtConsulta.setRows(10); 
+        txtConsulta.setRows(8); 
         
-        panelConsulta.add(scrConsulta, c);
+        getContentPane().add(scrConsulta, c);
 		
         c.gridx = 1;
         c.gridy = 0;
+        c.ipadx = 0;
+        c.ipady = 80;
+        c.weighty = 0.5;
         c.gridheight = 1;
         c.insets = new Insets(0,0,0,0);
-        btnEjecutar = new JButton();
-        panelConsulta.add(btnEjecutar, c);
-        btnEjecutar.setText("Ejecutar");
-        btnEjecutar.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent evt) {
-              AdminWindow.this.refreshTable();
-           }
-        });
+        btnEjecutar = new CustomButton("EJECUTAR", 130, 70, "tall");
+        btnEjecutar.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent arg0) {}
+			public void mouseEntered(MouseEvent arg0) {}
+			public void mouseExited(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {}
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				AdminWindow.this.refreshTable();
+			}
+	        });
+        getContentPane().add(btnEjecutar, c);
         
         c.gridy = 1;
-     	botonBorrar = new JButton();
-     	panelConsulta.add(botonBorrar);
-     	botonBorrar.setText("Borrar");            
-     	botonBorrar.addActionListener(new ActionListener() {
-     		public void actionPerformed(ActionEvent arg0) {
-     		  txtConsulta.setText("");            			
-     		}
-     	});
-
-        getContentPane().add(panelConsulta, BorderLayout.NORTH);
+     	botonBorrar = new CustomButton("BORRAR", 130, 70, "tall");
+     	botonBorrar.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent arg0) {}
+			public void mouseEntered(MouseEvent arg0) {}
+			public void mouseExited(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {}
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				txtConsulta.setText("");   
+			}
+	        });
+     	getContentPane().add(botonBorrar,c);
      	
 	 	tabla = t;
+	 	tabla.setBackground(new Color(247, 247, 247));
+	 	tabla.setForeground(new Color(247, 247, 247));
+	 	c.gridx = 0;
+	 	c.gridy = 2;
+	 	c.ipadx = 765;
+	 	c.ipady = 400;
+	 	c.gridwidth = 2;
 	 	
 	 	// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
-	     getContentPane().add(tabla, BorderLayout.SOUTH);
+	     getContentPane().add(tabla, c);
 	     
 	    // setea la tabla para sólo lectura (no se puede editar su contenido)  
 	    tabla.setEditable(false);
