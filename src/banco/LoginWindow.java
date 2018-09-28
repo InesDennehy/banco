@@ -11,12 +11,17 @@ import java.awt.Insets;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import quick.dbtable.DBTable;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 
 public class LoginWindow extends JDialog {
@@ -24,8 +29,8 @@ public class LoginWindow extends JDialog {
 	private JPanel contentPane;
 	private JCTextField tfUser;
 	private JCPasswordTextField tfPassword;
-	private JButton btnOk;
-	private JButton btnDesconectar;
+	private CustomButton btnOk;
+	private CustomButton btnDesconectar;
 	public static Font font = new Font("Segan-Light", Font.PLAIN, 14);
 	public static Font font2 = new Font("Segan-Light", Font.PLAIN, 12);
 
@@ -62,7 +67,7 @@ public class LoginWindow extends JDialog {
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
-		c.fill = GridBagConstraints.HORIZONTAL;
+		c.fill = GridBagConstraints.BOTH;
 		c.ipadx = 30;
 		c.ipady = 5;
 		c.gridwidth = 2;
@@ -79,39 +84,12 @@ public class LoginWindow extends JDialog {
 		tfUser.setColumns(10);
 		tfUser.setPlaceholder("Usuario");
 		
-		tfUser.addFocusListener(new FocusListener() {
-
-		    @Override
-		    public void focusGained(FocusEvent e) {
-		    	tfUser.setBackground(new Color(255, 251, 229));
-		    }
-
-		    @Override
-		    public void focusLost(FocusEvent e) {
-		        tfUser.setBackground(Color.white);
-		    }
-
-		});
-		
 		c.gridy = 2;
 		
 		tfPassword = new JCPasswordTextField();
 		contentPane.add(tfPassword, c);
 		tfPassword.setColumns(10);
 		tfPassword.setPlaceholder("Contraseña");
-		tfPassword.addFocusListener(new FocusListener() {
-
-		    @Override
-		    public void focusGained(FocusEvent e) {
-		    	tfPassword.setBackground(new Color(255, 251, 229));
-		    }
-
-		    @Override
-		    public void focusLost(FocusEvent e) {
-		        tfPassword.setBackground(Color.white);
-		    }
-
-		});
 		
 		c.gridy = 3;
 		c.ipadx = 0;
@@ -120,15 +98,41 @@ public class LoginWindow extends JDialog {
 		c.weightx = 0.8;
 		c.insets = new Insets(0,10,0,0);
 		
-		//Color de boton 153, 167, 255
-		btnOk = new JButton("OK");
-		btnOk.setFont(font2);;
-		btnOk.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				boolean b = Connector.getConnection().adminLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
-				if(b) {
+		btnOk = new CustomButton("OK", 120,30);
+		btnOk.setFont(font2);
+		btnOk.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				DBTable tabla = Connector.getConnection().adminLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
+				if(tabla != null) {
 					try {
-						AdminWindow frame = new AdminWindow();
+						AdminWindow frame = new AdminWindow(tabla);
 						frame.setVisible(true);
 						//LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
 					} catch (Exception e) {
@@ -138,6 +142,7 @@ public class LoginWindow extends JDialog {
 				else {
 					tfPassword.setText("pone bien la contra imbecil");
 				}
+				
 			}
 		});
 		contentPane.add(btnOk, c);
@@ -146,11 +151,37 @@ public class LoginWindow extends JDialog {
 		c.insets = new Insets(0,0,0,10);
 		c.weightx = 0.2;
 		
-		btnDesconectar = new JButton("DESCONECTAR");
-		btnDesconectar.setFont(font2);
-		btnDesconectar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		btnDesconectar = new CustomButton("DESCONECTAR",120,30);
+		btnDesconectar.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
 				boolean b = Connector.getConnection().disconnect(LoginWindow.this);
+				
 			}
 		});
 		contentPane.add(btnDesconectar, c);

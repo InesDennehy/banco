@@ -2,6 +2,8 @@ package banco;
 
 import javax.swing.JOptionPane;
 
+import quick.dbtable.DBTable;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -17,14 +19,18 @@ public class Connector {
 		return connector;
 	}
 	
-	public boolean adminLogin(LoginWindow w, String user, String password) {
+	public DBTable adminLogin(LoginWindow w, String user, String password) {
+		
 		if(user.equals("admin") && password.equals("admin")) {
+			DBTable tabla = null;
 			try{
+				tabla = new DBTable();
 				String driver ="com.mysql.cj.jdbc.Driver";
 	        	String server = "localhost:3306";
 	            String database = "banco";
 	            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
 	            connection = DriverManager.getConnection(uriConnection, user, password);
+				tabla.connectDatabase(driver, uriConnection, user, password);
 	         }
 	         catch (SQLException ex){
 	            JOptionPane.showMessageDialog(w,
@@ -34,11 +40,14 @@ public class Connector {
 	            System.out.println("SQLException: " + ex.getMessage());
 	            System.out.println("SQLState: " + ex.getSQLState());
 	            System.out.println("VendorError: " + ex.getErrorCode());
-	         }
-			return true;
+	            tabla = null;
+	         } catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			return tabla;
 		}
 		else {
-			return false;
+			return null;
 		}
 	}
 	

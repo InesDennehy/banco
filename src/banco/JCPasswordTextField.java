@@ -4,9 +4,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -41,6 +42,19 @@ public class JCPasswordTextField extends JPasswordField{
             public void changedUpdate(DocumentEvent de) {}
 
         });
+        JCPasswordTextField.this.addFocusListener(new FocusListener() {
+
+		    @Override
+		    public void focusGained(FocusEvent e) {
+		    	JCPasswordTextField.this.setBackground(new Color(255, 246, 214));
+		    }
+
+		    @Override
+		    public void focusLost(FocusEvent e) {
+		    	JCPasswordTextField.this.setBackground(Color.white);
+		    }
+
+		});
     }
 
     public void setPlaceholder(String placeholder)

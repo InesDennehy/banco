@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -39,6 +42,19 @@ public class JCTextField extends JTextField{
             public void changedUpdate(DocumentEvent de) {}
 
         });
+        JCTextField.this.addFocusListener(new FocusListener() {
+
+		    @Override
+		    public void focusGained(FocusEvent e) {
+		    	JCTextField.this.setBackground(new Color(255, 246, 214));
+		    }
+
+		    @Override
+		    public void focusLost(FocusEvent e) {
+		    	JCTextField.this.setBackground(Color.white);
+		    }
+
+		});
     }
 
     public void setPlaceholder(String placeholder)

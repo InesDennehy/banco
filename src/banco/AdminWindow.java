@@ -3,6 +3,9 @@ package banco;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -27,62 +30,75 @@ import quick.dbtable.DBTable;
 
 public class AdminWindow extends JDialog {
 
-	private JPanel contentPane;
-	private JPanel pnlConsulta;
 	private JTextArea txtConsulta;
 	private JButton botonBorrar;
 	private JButton btnEjecutar;
 	private DBTable tabla;    
 	private JScrollPane scrConsulta;
+	private JPanel panelConsulta;
 
 	/**
 	 * Create the frame.
 	 */
-	public AdminWindow() {
+	public AdminWindow(DBTable t) {
 		setPreferredSize(new Dimension(800, 600));
         this.setBounds(0, 0, 800, 600);
         setVisible(true);
-        BorderLayout thisLayout = new BorderLayout();
-        this.setTitle("Consultas (Utilizando DBTable)");
-        getContentPane().setLayout(thisLayout);
+        this.setTitle("Admin");
+        getContentPane().setLayout(new BorderLayout());
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setResizable(true);
+
+        panelConsulta = new JPanel(new GridBagLayout());
         
-        pnlConsulta = new JPanel();
-        getContentPane().add(pnlConsulta, BorderLayout.NORTH);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridheight = 2;
+        c.fill = GridBagConstraints.BOTH;
+        
         scrConsulta = new JScrollPane();
-        pnlConsulta.add(scrConsulta);
         txtConsulta = new JTextArea();
         scrConsulta.setViewportView(txtConsulta);
         txtConsulta.setTabSize(3);
         txtConsulta.setColumns(80);
         txtConsulta.setBorder(BorderFactory.createEtchedBorder(BevelBorder.LOWERED));
-        txtConsulta.setText("SELECT legajo FROM Empleados;");
-        txtConsulta.setFont(new java.awt.Font("Monospaced",0,12));
+        txtConsulta.setText("SELECT legajo FROM Empleado;");
+        txtConsulta.setFont(LoginWindow.font);
         txtConsulta.setRows(10); 
+        
+        panelConsulta.add(scrConsulta, c);
 		
+        c.gridx = 1;
+        c.gridy = 0;
+        c.gridheight = 1;
+        c.insets = new Insets(0,0,0,0);
         btnEjecutar = new JButton();
-        pnlConsulta.add(btnEjecutar);
+        panelConsulta.add(btnEjecutar, c);
         btnEjecutar.setText("Ejecutar");
         btnEjecutar.addActionListener(new ActionListener() {
            public void actionPerformed(ActionEvent evt) {
               AdminWindow.this.refreshTable();
            }
         });
+        
+        c.gridy = 1;
      	botonBorrar = new JButton();
-     	pnlConsulta.add(botonBorrar);
+     	panelConsulta.add(botonBorrar);
      	botonBorrar.setText("Borrar");            
      	botonBorrar.addActionListener(new ActionListener() {
      		public void actionPerformed(ActionEvent arg0) {
      		  txtConsulta.setText("");            			
      		}
      	});
-	 	// crea la tabla  
-	 	tabla = new DBTable();
+
+        getContentPane().add(panelConsulta, BorderLayout.NORTH);
+     	
+	 	tabla = t;
 	 	
 	 	// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
-	     getContentPane().add(tabla, BorderLayout.CENTER);           
-	               
+	     getContentPane().add(tabla, BorderLayout.SOUTH);
+	     
 	    // setea la tabla para sólo lectura (no se puede editar su contenido)  
 	    tabla.setEditable(false);
 	}
@@ -94,7 +110,7 @@ public class AdminWindow extends JDialog {
 
 			// obtenemos el modelo de la tabla a partir de la consulta para 
 			// modificar la forma en que se muestran de algunas columnas  
-			tabla.createColumnModelFromQuery();    	    
+			tabla.createColumnModelFromQuery();
 			for (int i = 0; i < tabla.getColumnCount(); i++){ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
 				if (tabla.getColumn(i).getType()==Types.TIME){    		 
 					tabla.getColumn(i).setType(Types.CHAR);  
