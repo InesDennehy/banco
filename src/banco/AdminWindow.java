@@ -36,6 +36,7 @@ public class AdminWindow extends JDialog {
 	private JTextArea txtConsulta;
 	private CustomButton botonBorrar;
 	private CustomButton btnEjecutar;
+	private CustomButton btnInfoTables;
 	private DBTable tabla;    
 	private JScrollPane scrConsulta;
 
@@ -43,22 +44,21 @@ public class AdminWindow extends JDialog {
 	 * Create the frame.
 	 */
 	public AdminWindow(DBTable t) {
-		setPreferredSize(new Dimension(800, 600));
 		this.setResizable(false);
+		setPreferredSize(new Dimension(800, 600));
         this.setBounds(0, 0, 800, 600);
         setVisible(true);
         this.setTitle("BD Bank - Admin");
         getContentPane().setLayout(new GridBagLayout());
-        getContentPane().setBackground(new Color(247, 247, 247));
+        getContentPane().setBackground(new Color(232, 236, 242));
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        this.setResizable(true);
         
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         c.ipadx = 600;
         c.ipady = 200;
-        c.gridheight = 2;
+        c.gridheight = 3;
         c.fill = GridBagConstraints.BOTH;
         
         scrConsulta = new JScrollPane();
@@ -67,6 +67,7 @@ public class AdminWindow extends JDialog {
         txtConsulta.setTabSize(3);
         txtConsulta.setColumns(30);
         txtConsulta.setText("SELECT legajo FROM Empleado;");
+	 	txtConsulta.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         txtConsulta.setFont(LoginWindow.font);
         txtConsulta.setRows(8); 
         
@@ -79,7 +80,7 @@ public class AdminWindow extends JDialog {
         c.weighty = 0.5;
         c.gridheight = 1;
         c.insets = new Insets(0,0,0,0);
-        btnEjecutar = new CustomButton("EJECUTAR", 130, 70, "tall");
+        btnEjecutar = new CustomButton("EJECUTAR", 130, 45, "medium");
         btnEjecutar.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent arg0) {}
 			public void mouseEntered(MouseEvent arg0) {}
@@ -93,7 +94,7 @@ public class AdminWindow extends JDialog {
         getContentPane().add(btnEjecutar, c);
         
         c.gridy = 1;
-     	botonBorrar = new CustomButton("BORRAR", 130, 70, "tall");
+     	botonBorrar = new CustomButton("BORRAR", 130, 45, "medium");
      	botonBorrar.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent arg0) {}
 			public void mouseEntered(MouseEvent arg0) {}
@@ -106,11 +107,25 @@ public class AdminWindow extends JDialog {
 	        });
      	getContentPane().add(botonBorrar,c);
      	
+     	c.gridy = 2;
+     	btnInfoTables = new CustomButton("INFO TABLAS", 130, 45, "medium");
+     	btnInfoTables.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent arg0) {}
+			public void mouseEntered(MouseEvent arg0) {}
+			public void mouseExited(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {}
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				InfoTablesWindow frame = new InfoTablesWindow();
+				frame.setVisible(true);
+			}
+	        });
+     	getContentPane().add(btnInfoTables,c);
+     	
 	 	tabla = t;
 	 	tabla.setBackground(new Color(247, 247, 247));
-	 	tabla.setForeground(new Color(247, 247, 247));
 	 	c.gridx = 0;
-	 	c.gridy = 2;
+	 	c.gridy = 3;
 	 	c.ipadx = 765;
 	 	c.ipady = 400;
 	 	c.gridwidth = 2;

@@ -15,6 +15,7 @@ import javax.swing.border.EmptyBorder;
 
 import quick.dbtable.DBTable;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import java.awt.event.ActionEvent;
@@ -33,6 +34,8 @@ public class LoginWindow extends JDialog {
 	private JCPasswordTextField tfPassword;
 	private CustomButton btnOk;
 	private CustomButton btnDesconectar;
+	private GridBagConstraints c;
+	private JLabel errorMessage;
 	public static Font font = new Font("Segan-Light", Font.PLAIN, 14);
 	public static Font font2 = new Font("Segan-Light", Font.PLAIN, 12);
 
@@ -63,23 +66,25 @@ public class LoginWindow extends JDialog {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new GridBagLayout());
-		contentPane.setBackground(new Color(247, 247, 247));
+		contentPane.setBackground(new Color(232, 236, 242));
 		setContentPane(contentPane);
 		
-		GridBagConstraints c = new GridBagConstraints();
+		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.BOTH;
 		c.ipadx = 30;
 		c.ipady = 5;
+		c.weighty = 1;
 		c.gridwidth = 2;
-		c.insets = new Insets(0,15,0,10);
+		c.insets = new Insets(0,15,0,15);
 		JLabel lblLogin = new JLabel("BD Bank - Login");
 		lblLogin.setFont(font);
 		contentPane.add(lblLogin, c);
 		
 		c.gridy = 1;
-		c.insets = new Insets(5,10,5,10);
+		c.ipady = 0;
+		c.insets = new Insets(5,10,5,5);
 		
 		tfUser = new JCTextField();
 		contentPane.add(tfUser, c);
@@ -92,13 +97,24 @@ public class LoginWindow extends JDialog {
 		contentPane.add(tfPassword, c);
 		tfPassword.setColumns(10);
 		tfPassword.setPlaceholder("Contraseña");
-		
+
+		c.gridx = 0;
 		c.gridy = 3;
+		c.weighty = 0;
+		c.gridwidth = 2;
+		
+		errorMessage = new JLabel("");
+		errorMessage.setForeground(new Color(214, 65, 57));
+		errorMessage.setFont(font2);
+		contentPane.add(errorMessage, c);
+		
+		c.gridy = 4;
 		c.ipadx = 0;
 		c.ipady = 0;
 		c.gridwidth = 1;
 		c.weightx = 0.8;
-		c.insets = new Insets(0,10,0,0);
+		c.weighty = 1;
+		c.insets = new Insets(0,5,0,0);
 		
 		btnOk = new CustomButton("OK", 123, 30, "normal");
 		btnOk.setFont(font2);
@@ -118,13 +134,26 @@ public class LoginWindow extends JDialog {
 					try {
 						AdminWindow frame = new AdminWindow(tabla);
 						frame.setVisible(true);
+						errorMessage.setText("");
+						LoginWindow.this.setBounds(100, 100, 300, 220);
+						tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+						tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 						//LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 				else {
-					tfPassword.setText("pone bien la contra imbecil");
+					LoginWindow.this.setBounds(100, 100, 300, 260);
+					StringBuilder sb = new StringBuilder(64);
+	                sb.append("<html>El usuario o contraseña ingresados no son correctos, por favor inténtelo de nuevo</html>");
+
+	                errorMessage.setText(sb.toString());
+					errorMessage.setBounds(100, 100, 300, 50);
+					tfUser.setBorder(BorderFactory.createCompoundBorder(
+							BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+					tfPassword.setBorder(BorderFactory.createCompoundBorder(
+							BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
 				}
 				
 			}

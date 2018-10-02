@@ -7,13 +7,14 @@ import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class JCTextField extends JTextField{
 
-    private Dimension d = new Dimension(200,32);
+    private Dimension d = new Dimension(200,25);
     private String placeholder = "";
     private Color phColor= new Color(0,0,0);
     private boolean band = true;
@@ -23,9 +24,10 @@ public class JCTextField extends JTextField{
         super();
         setSize(d);
         setFont(LoginWindow.font);
+        setMargin( new Insets(0,5,0,0));
+    	setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
         setPreferredSize(d);
         setVisible(true);
-        setMargin( new Insets(0,5,0,0));
         getDocument().addDocumentListener(new DocumentListener() {
 
             @Override

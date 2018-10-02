@@ -29,9 +29,13 @@ public class CustomButton extends JLabel{
 			Image image = imageIcon.getImage(); // transform it 
 			Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 			imageIcon = new ImageIcon(newimg);  // transform it back
-		}
-		else if(mode == "tall") {
+		} else if(mode == "tall") {
 			imageIcon = new ImageIcon("botonTall.png"); // load the image to a imageIcon
+			Image image = imageIcon.getImage(); // transform it 
+			Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+			imageIcon = new ImageIcon(newimg);  // transform it back
+		} else if(mode == "medium") {
+			imageIcon = new ImageIcon("botonMedium.png"); // load the image to a imageIcon
 			Image image = imageIcon.getImage(); // transform it 
 			Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 			imageIcon = new ImageIcon(newimg);  // transform it back
@@ -61,7 +65,15 @@ public class CustomButton extends JLabel{
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 					imageIcon = new ImageIcon(newimg);  // transform it back
 					CustomButton.this.setIcon(imageIcon);
-				} else if (mode == "tall") {
+				}
+				if(mode == "medium") {
+					ImageIcon imageIcon = new ImageIcon("mouseEnteredMedium.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
+				if (mode == "tall") {
 					ImageIcon imageIcon = new ImageIcon("mouseEnteredTall.png"); // load the image to a imageIcon
 					Image image = imageIcon.getImage(); // transform it 
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
@@ -79,7 +91,15 @@ public class CustomButton extends JLabel{
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 					imageIcon = new ImageIcon(newimg);  // transform it back
 					CustomButton.this.setIcon(imageIcon);
-				} else if (mode == "tall") {
+				}
+				if(mode == "medium") {
+					ImageIcon imageIcon = new ImageIcon("botonMedium.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
+				if (mode == "tall") {
 					ImageIcon imageIcon = new ImageIcon("botonTall.png"); // load the image to a imageIcon
 					Image image = imageIcon.getImage(); // transform it 
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
@@ -97,8 +117,16 @@ public class CustomButton extends JLabel{
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 					imageIcon = new ImageIcon(newimg);  // transform it back
 					CustomButton.this.setIcon(imageIcon);
-				} else if (mode == "tall") {
+				}
+				if (mode == "tall") {
 					ImageIcon imageIcon = new ImageIcon("mousePressedTall.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
+				if(mode == "medium") {
+					ImageIcon imageIcon = new ImageIcon("mousePressedMedium.png"); // load the image to a imageIcon
 					Image image = imageIcon.getImage(); // transform it 
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 					imageIcon = new ImageIcon(newimg);  // transform it back
@@ -116,8 +144,16 @@ public class CustomButton extends JLabel{
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 					imageIcon = new ImageIcon(newimg);  // transform it back
 					CustomButton.this.setIcon(imageIcon);
-				} else if (mode == "tall") {
+				}
+				if (mode == "tall") {
 					ImageIcon imageIcon = new ImageIcon("mouseEnteredTall.png"); // load the image to a imageIcon
+					Image image = imageIcon.getImage(); // transform it 
+					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
+					imageIcon = new ImageIcon(newimg);  // transform it back
+					CustomButton.this.setIcon(imageIcon);
+				}
+				if(mode == "medium") {
+					ImageIcon imageIcon = new ImageIcon("mouseEnteredMedium.png"); // load the image to a imageIcon
 					Image image = imageIcon.getImage(); // transform it 
 					Image newimg = image.getScaledInstance(x, y,  java.awt.Image.SCALE_SMOOTH); // scale it the smooth way  
 					imageIcon = new ImageIcon(newimg);  // transform it back
