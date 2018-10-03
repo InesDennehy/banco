@@ -1,6 +1,5 @@
 package banco;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -10,24 +9,17 @@ import java.awt.Insets;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
-import quick.dbtable.DBTable;
-
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JDialog;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import javax.swing.JFrame;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 
-public class LoginWindow extends JDialog {
+public class LoginWindow extends JFrame {
 
 	private JPanel contentPane;
 	private JCTextField tfUser;
@@ -129,16 +121,29 @@ public class LoginWindow extends JDialog {
 			public void mousePressed(MouseEvent arg0) {}
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				DBTable tabla = Connector.getConnection().adminLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
-				if(tabla != null) {
+				LoginInfo info = Connector.getConnection().login(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
+				if(info != null && info.getStatus() == "admin") {
 					try {
-						AdminWindow frame = new AdminWindow(tabla);
+						AdminWindow frame = new AdminWindow(info.getTable());
 						frame.setVisible(true);
 						errorMessage.setText("");
 						LoginWindow.this.setBounds(100, 100, 300, 220);
 						tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
 						tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-						//LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
+						LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+				else if(info != null && info.getStatus() == "atm") {
+					try {
+						ATMWindow frame = new ATMWindow(info.getNumber());
+						frame.setVisible(true);
+						errorMessage.setText("");
+						LoginWindow.this.setBounds(100, 100, 300, 220);
+						tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+						tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+						LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -176,7 +181,7 @@ public class LoginWindow extends JDialog {
 			public void mousePressed(MouseEvent arg0) {}
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				boolean b = Connector.getConnection().disconnect(LoginWindow.this);
+				Connector.getConnection().disconnect(LoginWindow.this);
 			}
 		});
 		contentPane.add(btnDesconectar, c);
