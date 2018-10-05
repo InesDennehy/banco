@@ -124,7 +124,7 @@ public class LoginWindow extends JFrame {
 				LoginInfo info = Connector.getConnection().login(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
 				if(info != null && info.getStatus() == "admin") {
 					try {
-						AdminWindow frame = new AdminWindow(info.getTable());
+						AdminWindow frame = new AdminWindow();
 						frame.setVisible(true);
 						errorMessage.setText("");
 						LoginWindow.this.setBounds(100, 100, 300, 220);
@@ -138,6 +138,18 @@ public class LoginWindow extends JFrame {
 				else if(info != null && info.getStatus() == "atm") {
 					try {
 						ATMWindow frame = new ATMWindow(info.getNumber());
+						frame.setVisible(true);
+						errorMessage.setText("");
+						LoginWindow.this.setBounds(100, 100, 300, 220);
+						tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+						tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+						LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}else if(info != null && info.getStatus() == "empleado") {
+					try {
+						StaffWindow frame = new StaffWindow((int)info.getNumber());
 						frame.setVisible(true);
 						errorMessage.setText("");
 						LoginWindow.this.setBounds(100, 100, 300, 220);

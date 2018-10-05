@@ -2,10 +2,7 @@ package banco;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
-import quick.dbtable.DBTable;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 public class Connector {
@@ -32,13 +31,11 @@ public class Connector {
 			try{
 				loginInfo = new LoginInfo();
 				loginInfo.setStatus("admin");
-				loginInfo.setTable(new DBTable());
 				String driver ="com.mysql.cj.jdbc.Driver";
 	        	String server = "localhost:3306";
 	            String database = "banco";
 	            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
 	            connection = DriverManager.getConnection(uriConnection, user, password);
-				loginInfo.getTable().connectDatabase(driver, uriConnection, user, password);
 	         }
 	         catch (SQLException ex){
 	            JOptionPane.showMessageDialog(w,
@@ -49,16 +46,13 @@ public class Connector {
 	            System.out.println("SQLState: " + ex.getSQLState());
 	            System.out.println("VendorError: " + ex.getErrorCode());
 	            loginInfo = null;
-	         } catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			}
+	         }
 			return loginInfo;
 		}
 		else {
 			try{
 				loginInfo = new LoginInfo();
 				loginInfo.setStatus("empleado");
-				loginInfo.setTable(new DBTable());
 				String driver ="com.mysql.cj.jdbc.Driver";
 	        	String server = "localhost:3306";
 	            String database = "banco";
@@ -67,18 +61,15 @@ public class Connector {
 				Statement stmt = connection.createStatement();
 		        ResultSet rs = stmt.executeQuery("select legajo from empleado where "+user+" = legajo and md5("+password+") = password;");
 		        if(rs != null && rs.next()) {
-					loginInfo.setTable(new DBTable());
 					loginInfo.setNumber(Integer.parseInt(user));
 		        }
 		        else {
 		        	loginInfo = new LoginInfo();
 					loginInfo.setStatus("atm");
-					loginInfo.setTable(new DBTable());
 		            connection = DriverManager.getConnection(uriConnection, "atm", "atm");
 		            stmt = connection.createStatement();
 			        rs = stmt.executeQuery("select nro_tarjeta from Tarjeta where "+user+" = nro_tarjeta and md5("+password+") = pin;");
 			        if(rs != null && rs.next()) {
-						loginInfo.setTable(new DBTable());
 						loginInfo.setNumber(Integer.parseInt(user));
 			        }
 			        else loginInfo = null;
@@ -96,6 +87,30 @@ public class Connector {
 	         }
 			return loginInfo;
 		}
+	}
+	
+	public DefaultTableModel getQuery(String query) throws SQLException{
+		
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+    	StringTokenizer st = new StringTokenizer(query);
+    	String sentencia = st.nextToken();
+    	if(sentencia.toLowerCase().equals("insert") || sentencia.toLowerCase().equals("update")) {
+	    	stmt = connection.createStatement();
+			stmt.executeUpdate(query);
+			stmt.close();
+    	}
+    	else if(sentencia.toLowerCase().equals("select")) {
+	        stmt = connection.createStatement();
+	        rs = stmt.executeQuery(query);
+			return this.buildTableModel(rs);
+    	}
+    	else {
+    		stmt = connection.createStatement();
+			stmt.execute(query);
+			stmt.close();
+    	}
+    	return null;
 	}
 	
 	public boolean disconnect(LoginWindow w) {
@@ -211,15 +226,13 @@ public class Connector {
 		return 0;
 	}
 
-	public JTable getUltimasTransacciones(int nroCuenta) {
+	public DefaultTableModel getATMQuery(int nroCuenta, String query) {
 		// TODO Auto-generated method stub
 		java.sql.Statement stmt = null;
-	    String query = "select nro_trans, fecha, hora, tipo, monto from trans_cajas_ahorro where nro_ca = "+Integer.toString(nroCuenta);
 	    try {
 	        stmt = connection.createStatement();
 	        ResultSet rs = stmt.executeQuery(query);
-	        JTable tabla = new JTable(buildTableModel(rs));
-	        return tabla;
+	        return buildATMTableModel(rs);
 	    } catch (SQLException e ) {
 	        e.printStackTrace();
 	    } finally {
@@ -233,7 +246,46 @@ public class Connector {
 		return null;
 	}
 	
-	public static DefaultTableModel buildTableModel(ResultSet rs)
+	public DefaultTableModel buildATMTableModel(ResultSet rs) throws SQLException {
+
+		    ResultSetMetaData metaData = rs.getMetaData();
+
+		    // names of columns
+		    Vector<String> columnNames = new Vector<String>();
+		    int columnCount = metaData.getColumnCount();
+		    for (int column = 1; column <= columnCount; column++) {
+		        columnNames.add(metaData.getColumnName(column));
+		    }
+
+		    // data of the table
+		    Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+		    while (rs.next()) {
+		        Vector<Object> vector = new Vector<Object>();
+		        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+		        	if(metaData.getColumnType(columnIndex) == Types.DATE)
+		        		vector.add(cambiarFecha(rs.getString(columnIndex)));
+		        	else if(metaData.getColumnType(columnIndex) == Types.DECIMAL && (
+		        		rs.getString(columnIndex-1).toLowerCase().equals("debito") || 
+		        		rs.getString(columnIndex-1).toLowerCase().equals("extraccion") || 
+		        		rs.getString(columnIndex-1).toLowerCase().equals("transferencia")))
+		        		
+		        			vector.add("-"+rs.getString(columnIndex));
+	
+		        	else
+		        		vector.add(rs.getString(columnIndex));
+		        }
+		        data.add(vector);
+		    }
+		    DefaultTableModel dtm = new DefaultTableModel(data, columnNames) {
+		    	@Override
+		    	public boolean isCellEditable(int arg0, int arg1) {
+		    		return false;
+		    	}
+		    };
+		    return dtm;
+	}
+	
+	public DefaultTableModel buildTableModel(ResultSet rs)
 	        throws SQLException {
 
 	    ResultSetMetaData metaData = rs.getMetaData();
@@ -250,12 +302,27 @@ public class Connector {
 	    while (rs.next()) {
 	        Vector<Object> vector = new Vector<Object>();
 	        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-	        	vector.add(rs.getObject(columnIndex));
+	        	if(metaData.getColumnType(columnIndex) == Types.DATE)
+	        		vector.add(cambiarFecha(rs.getString(columnIndex)));
+	        	else
+	        		vector.add(rs.getString(columnIndex));
 	        }
 	        data.add(vector);
 	    }
 
-	    return new DefaultTableModel(data, columnNames);
-
+	    DefaultTableModel dtm = new DefaultTableModel(data, columnNames) {
+	    	@Override
+	    	public boolean isCellEditable(int arg0, int arg1) {
+	    		return false;
+	    	}
+	    };
+	    return dtm;
 	}
+	
+	private String cambiarFecha(String old) {
+		return (Character.toString(old.charAt(8))+Character.toString(old.charAt(9))+"/"+
+				Character.toString(old.charAt(5))+Character.toString(old.charAt(6))+"/"+
+				Character.toString(old.charAt(0))+Character.toString(old.charAt(1))+Character.toString(old.charAt(2))+Character.toString(old.charAt(3)));
+	}
+
 }

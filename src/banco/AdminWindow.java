@@ -1,6 +1,7 @@
 package banco;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -8,16 +9,16 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
-import java.sql.Types;
-
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import quick.dbtable.DBTable;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 public class AdminWindow extends JFrame {
 
@@ -25,13 +26,13 @@ public class AdminWindow extends JFrame {
 	private CustomButton botonBorrar;
 	private CustomButton btnEjecutar;
 	private CustomButton btnInfoTables;
-	private DBTable tabla;    
+	private JTable tabla;    
 	private JScrollPane scrConsulta;
 
 	/**
 	 * Create the frame.
 	 */
-	public AdminWindow(DBTable t) {
+	public AdminWindow() {
 		this.setResizable(false);
 		setPreferredSize(new Dimension(800, 600));
         this.setBounds(0, 0, 800, 600);
@@ -110,44 +111,42 @@ public class AdminWindow extends JFrame {
 	        });
      	getContentPane().add(btnInfoTables,c);
      	
-	 	tabla = t;
-	 	tabla.setBackground(new Color(247, 247, 247));
+     	JScrollPane sp = new JScrollPane();
+	 	tabla = new JTable();
+	 	tabla.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				if( !isSelected ) {
+			         Color c = table.getBackground();
+			         if( (row%2)==0 &&
+			                 c.getRed()>10 && c.getGreen()>10 && c.getBlue()>10 )
+			            setBackground(new Color( c.getRed()-10,
+			                                     c.getGreen()-10,
+			                                     c.getBlue()-10));
+			         else
+			            setBackground(c);
+			      }
+			      return super.getTableCellRendererComponent( table, value,isSelected,hasFocus,row,column);
+		   }
+			
+		});
+	 	sp.add(tabla);
 	 	c.gridx = 0;
 	 	c.gridy = 3;
 	 	c.ipadx = 765;
 	 	c.ipady = 400;
 	 	c.gridwidth = 2;
 	 	
-	 	// Agrega la tabla al frame (no necesita JScrollPane como Jtable)
-	     getContentPane().add(tabla, c);
-	     
-	    // setea la tabla para sólo lectura (no se puede editar su contenido)  
-	    tabla.setEditable(false);
+	    getContentPane().add(new JScrollPane(tabla), c);
 	}
 
 	private void refreshTable() {
 		try{
-			// seteamos la consulta a partir de la cual se obtendrán los datos para llenar la tabla
-			tabla.setSelectSql(this.txtConsulta.getText().trim());
-
-			// obtenemos el modelo de la tabla a partir de la consulta para 
-			// modificar la forma en que se muestran de algunas columnas  
-			tabla.createColumnModelFromQuery();
-			for (int i = 0; i < tabla.getColumnCount(); i++){ // para que muestre correctamente los valores de tipo TIME (hora)  		   		  
-				if (tabla.getColumn(i).getType()==Types.TIME){    		 
-					tabla.getColumn(i).setType(Types.CHAR);  
-				}
-	    		// cambiar el formato en que se muestran los valores de tipo DATE
-	    		if (tabla.getColumn(i).getType()==Types.DATE){
-	    			tabla.getColumn(i).setDateFormat("dd/MM/YYYY");
-	    		}
-	        }  
-			// actualizamos el contenido de la tabla.   	     	  
-	    	tabla.refresh();
-	    	// No es necesario establecer  una conexión, crear una sentencia y recuperar el 
-	    	// resultado en un resultSet, esto lo hace automáticamente la tabla (DBTable) a 
-	    	// patir de la conexión y la consulta seteadas con connectDatabase() y setSelectSql() respectivamente.	  
-		    }
+			DefaultTableModel tm = Connector.getConnection().getQuery(txtConsulta.getText());
+			if(tm != null) {
+				tabla.setModel(tm);
+			}
+		}
 		    catch (SQLException ex) {
 		    	// en caso de error, se muestra la causa en la consola
 		    	System.out.println("SQLException: " + ex.getMessage());
