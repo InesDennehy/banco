@@ -57,15 +57,7 @@ public class StaffWindow extends JFrame {
         c.weightx = 0;
         c.gridheight = 4;
         morosos = new JTable();
-		try {
-			morosos.setModel(Connector.getConnection().getQuery("select nro_cliente, tipo_doc, nro_doc, apellido, nombre, "
-					+ "nro_prestamo, monto, cant_meses, valor_cuota, count(a.nro_pago) as 'cuotas atrasadas' "
-					+ "from cliente natural join prestamo natural join (select * from pago where fecha_pago is NULL and "
-					+ "fecha_venc < curdate()) a group by nro_prestamo having count(a.nro_pago) >= 2;"));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		actualizarMorosos();
 		morosos.setBorder(null);
 		morosos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 				@Override
@@ -84,13 +76,6 @@ public class StaffWindow extends JFrame {
 			   }
 				
 			});
-		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(morosos.getModel());
-		morosos.setRowSorter(sorter);
-
-		List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
-		sortKeys.add(new RowSorter.SortKey(4, SortOrder.ASCENDING));
-		sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-		sorter.setSortKeys(sortKeys);
 		JScrollPane sp = new JScrollPane(morosos);
 		sp.setBackground(new Color(232, 236, 242));
 		getContentPane().add(sp, c);
@@ -251,13 +236,34 @@ public class StaffWindow extends JFrame {
 						+ "natural join prestamo natural join cliente where '"+prestamos.getValueAt(prestamos.getSelectedRow(), 0)+"' "
 						+ "= cliente.tipo_doc and "+prestamos.getValueAt(prestamos.getSelectedRow(), 1)+" = cliente.nro_doc "
 						+ "and fecha_pago is NULL;"));
+				actualizarMorosos();
 			}
 			if(cuotas.getRowCount() == 0) {
 				actualizarPrestamos();
 			}
+			
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		}
+	}
+
+	private void actualizarMorosos() {
+		try {
+			morosos.setModel(Connector.getConnection().getQuery("select nro_cliente, tipo_doc, nro_doc, apellido, nombre, "
+					+ "nro_prestamo, monto, cant_meses, valor_cuota, count(a.nro_pago) as 'cuotas atrasadas' "
+					+ "from cliente natural join prestamo natural join (select * from pago where fecha_pago is NULL and "
+					+ "fecha_venc < curdate()) a group by nro_prestamo having count(a.nro_pago) >= 2;"));
+			TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(morosos.getModel());
+			morosos.setRowSorter(sorter);
+
+			List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
+			sortKeys.add(new RowSorter.SortKey(4, SortOrder.ASCENDING));
+			sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+			sorter.setSortKeys(sortKeys);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
