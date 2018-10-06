@@ -360,7 +360,6 @@ public class Connector {
 				return false;
 			}
 			else {
-				System.out.println("retorne true");
 				return true;
 			}
 		} catch (SQLException e) {
@@ -376,7 +375,24 @@ public class Connector {
         try {
         	stmt = connection.createStatement();
 			rs = stmt.executeQuery("select distinct nro_prestamo from pago natural join prestamo natural join cliente where "
-					+ "'"+nroCliente+"' = cliente.nro_cliente and pago.fecha_pago is NULL;");
+					+ ""+nroCliente+" = cliente.nro_cliente and pago.fecha_pago is NULL;");
+			if(rs != null && rs.next())
+				return rs.getInt(1);
+			else
+				return 0;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return 0;
+	}
+	private int getPrestamo(int nroCliente) {
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+        try {
+        	stmt = connection.createStatement();
+			rs = stmt.executeQuery("select max(nro_prestamo) from prestamo natural join cliente where "
+					+ ""+nroCliente+" = cliente.nro_cliente and prestamo.fecha = curdate() group by nro_cliente;");
 			if(rs != null && rs.next())
 				return rs.getInt(1);
 			else
@@ -454,7 +470,9 @@ public class Connector {
 					+ "("+Integer.toString(nroCliente)+", "+Integer.toString(legajo)+", curdate(), "+Integer.toString(cuotas)+", "
 					+ "'"+Double.toString(monto)+"', '"+Double.toString(tasa)+"', "+ Double.toString(interes)+", "
 					+ ""+Double.toString((monto+interes)/cuotas)+");");
-			int nroPrestamo = this.getNroPrestamo(nroCliente);
+			stmt.close();
+			stmt = connection.createStatement();
+			int nroPrestamo = this.getPrestamo(nroCliente);
 			for(int i = 0; i<cuotas; i++) {
 				stmt.execute("INSERT INTO Pago(nro_prestamo, nro_pago,fecha_venc,fecha_pago) VALUES ("+Integer.toString(nroPrestamo)+", "
 						+ Integer.toString(i+1)+", DATE_ADD(CURDATE(), INTERVAL "+Integer.toString(i+1)+" MONTH), NULL);");
@@ -463,6 +481,23 @@ public class Connector {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public int getMaxMonto() {
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+        try {
+        	stmt = connection.createStatement();
+			rs = stmt.executeQuery("select max(monto_sup) from tasa_prestamo;");
+			if(rs != null && rs.next())
+				return rs.getInt(1);
+			else
+				return 0;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return 0;
 	}
 
 }

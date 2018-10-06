@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
@@ -26,7 +27,7 @@ public class NewLoanWindow extends JDialog{
 	/**
 	 * Create the frame.
 	 */
-	public NewLoanWindow(int legajo) {
+	public NewLoanWindow(int legajo, StaffWindow sw) {
 		this.setTitle("BD Bank - Nuevo Préstamo");
 		this.setResizable(false);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -118,15 +119,16 @@ public class NewLoanWindow extends JDialog{
 				try {
 					int nroCliente = Connector.getConnection().getNroCliente(tfUser.getText(), tfPassword.getText());
 					boolean noTienePrestamo = true;
+					int maxMonto = Connector.getConnection().getMaxMonto();
 					if(nroCliente != 0) {
 						noTienePrestamo = Connector.getConnection().noTienePrestamo(nroCliente);
-						System.out.println(noTienePrestamo);
 					}
-					if(nroCliente != 0 && noTienePrestamo && Double.parseDouble(tfMonto.getText()) < 30000) {
+					if(nroCliente != 0 && noTienePrestamo && Double.parseDouble(tfMonto.getText()) < maxMonto) {
 						Connector.getConnection().insertarPrestamo(nroCliente, Double.parseDouble(tfMonto.getText()), (Integer)cuotas.getSelectedItem(), legajo);
-						System.out.println("inserte un prestamo");
+						sw.actualizarPrestamos();
+						NewLoanWindow.this.dispatchEvent(new WindowEvent(NewLoanWindow.this, WindowEvent.WINDOW_CLOSING));
 					}
-					else if (Double.parseDouble(tfMonto.getText()) > 30000) {
+					else if (Double.parseDouble(tfMonto.getText()) > maxMonto) {
 						NewLoanWindow.this.setBounds(100, 100, 300, 290);
 						StringBuilder sb = new StringBuilder(64);
 					    sb.append("<html>El monto ingresado es mayor a la cantidad máxima permitida</html>");

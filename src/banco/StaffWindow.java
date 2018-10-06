@@ -9,15 +9,21 @@ import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 
 public class StaffWindow extends JFrame {
@@ -78,6 +84,13 @@ public class StaffWindow extends JFrame {
 			   }
 				
 			});
+		TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(morosos.getModel());
+		morosos.setRowSorter(sorter);
+
+		List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
+		sortKeys.add(new RowSorter.SortKey(4, SortOrder.ASCENDING));
+		sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+		sorter.setSortKeys(sortKeys);
 		JScrollPane sp = new JScrollPane(morosos);
 		sp.setBackground(new Color(232, 236, 242));
 		getContentPane().add(sp, c);
@@ -97,27 +110,30 @@ public class StaffWindow extends JFrame {
         c.ipadx = 0;
         c.ipady = 400;
         prestamos = new JTable();
-        try {
-			prestamos.setModel(Connector.getConnection().getQuery("select tipo_doc, nro_doc from prestamo a natural join cliente where exists "
-					+ "(select nro_pago from pago b where a.nro_prestamo = b.nro_prestamo and fecha_pago is NULL)"));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        prestamos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				if( !isSelected ) {
+			         Color c = table.getBackground();
+			         if( (row%2)==0 &&
+			                 c.getRed()>10 && c.getGreen()>10 && c.getBlue()>10 )
+			            setBackground(new Color( c.getRed()-10,
+			                                     c.getGreen()-10,
+			                                     c.getBlue()-10));
+			         else
+			            setBackground(c);
+			      }
+			      return super.getTableCellRendererComponent( table, value,isSelected,hasFocus,row,column);
+		   }
+			
+		});
+        actualizarPrestamos();
         ListSelectionModel listSelectionModel = prestamos.getSelectionModel();
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				// TODO Auto-generated method stub
-	        	try {
-					cuotas.setModel(Connector.getConnection().getQuery("select nro_pago, valor_cuota, fecha_venc from pago "
-							+ "natural join prestamo natural join cliente where '"+prestamos.getValueAt(prestamos.getSelectedRow(), 0)+"' "
-							+ "= cliente.tipo_doc and "+prestamos.getValueAt(prestamos.getSelectedRow(), 1)+" = cliente.nro_doc "
-							+ "and fecha_pago is NULL;"));
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+	        	actualizarCuotas();
 			}
         });
         getContentPane().add(new JScrollPane(prestamos), c);
@@ -142,16 +158,19 @@ public class StaffWindow extends JFrame {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				// TODO Auto-generated method stub
-				NewLoanWindow w = new NewLoanWindow(legajo);
+				NewLoanWindow w = new NewLoanWindow(legajo, StaffWindow.this);
 				w.setVisible(true);
 				w.setAlwaysOnTop(true);
 			}
         });
         
         c.gridy = 2;
+        c.anchor = GridBagConstraints.CENTER;
         c.gridheight = 1;
+        c.insets = new Insets(0,0,0,0);
         JLabel cu = new JLabel("Cuotas a pagar");
         cu.setFont(LoginWindow.font);
+        cu.setHorizontalAlignment(JLabel.CENTER);
         cu.setHorizontalTextPosition(JLabel.CENTER);
         getContentPane().add(cu, c);;
         
@@ -159,6 +178,24 @@ public class StaffWindow extends JFrame {
         c.ipadx = 0;
         c.ipady = 400;
         cuotas = new JTable();
+        c.insets = new Insets(5,5,5,5);
+        cuotas.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+				if( !isSelected ) {
+			         Color c = table.getBackground();
+			         if( (row%2)==0 &&
+			                 c.getRed()>10 && c.getGreen()>10 && c.getBlue()>10 )
+			            setBackground(new Color( c.getRed()-10,
+			                                     c.getGreen()-10,
+			                                     c.getBlue()-10));
+			         else
+			            setBackground(c);
+			      }
+			      return super.getTableCellRendererComponent( table, value,isSelected,hasFocus,row,column);
+		   }
+			
+		});
         getContentPane().add(new JScrollPane(cuotas), c);
         
         c.gridy = 4;
@@ -190,10 +227,37 @@ public class StaffWindow extends JFrame {
 							e.printStackTrace();
 						}
 		            }
+					actualizarCuotas();
 				}
 			}
         });
         getContentPane().add(pagar, c);
         
+	}
+	
+	public void actualizarPrestamos() {
+		 try {
+				prestamos.setModel(Connector.getConnection().getQuery("select tipo_doc, nro_doc from prestamo a natural join cliente where exists "
+						+ "(select nro_pago from pago b where a.nro_prestamo = b.nro_prestamo and fecha_pago is NULL)"));
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	private void actualizarCuotas() {
+		try {
+			if(prestamos.getSelectedRow() != -1) {
+				cuotas.setModel(Connector.getConnection().getQuery("select nro_pago, valor_cuota, fecha_venc from pago "
+						+ "natural join prestamo natural join cliente where '"+prestamos.getValueAt(prestamos.getSelectedRow(), 0)+"' "
+						+ "= cliente.tipo_doc and "+prestamos.getValueAt(prestamos.getSelectedRow(), 1)+" = cliente.nro_doc "
+						+ "and fecha_pago is NULL;"));
+			}
+			if(cuotas.getRowCount() == 0) {
+				actualizarPrestamos();
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}
 }
