@@ -150,8 +150,10 @@ public class ATMWindow extends JFrame{
 		JScrollPane sp = new JScrollPane(tabla);
 		sp.setBackground(new Color(232, 236, 242));
 		
-		inicio.setDate((String) tabla.getValueAt(tabla.getRowCount()-1, 0));
-		fin.setDate((String) tabla.getValueAt(0, 0));
+		if(tabla.getRowCount() > 0) {
+			inicio.setDate((String) tabla.getValueAt(tabla.getRowCount()-1, 0));
+			fin.setDate((String) tabla.getValueAt(0, 0));
+		}
 		
 		getContentPane().add(sp, c);
 		

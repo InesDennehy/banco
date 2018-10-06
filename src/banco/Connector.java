@@ -50,43 +50,65 @@ public class Connector {
 			return loginInfo;
 		}
 		else {
-			try{
-				loginInfo = new LoginInfo();
-				loginInfo.setStatus("empleado");
-				String driver ="com.mysql.cj.jdbc.Driver";
-	        	String server = "localhost:3306";
-	            String database = "banco";
-	            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
-	            connection = DriverManager.getConnection(uriConnection, "empleado", "empleado");
-				Statement stmt = connection.createStatement();
-		        ResultSet rs = stmt.executeQuery("select legajo from empleado where "+user+" = legajo and md5("+password+") = password;");
-		        if(rs != null && rs.next()) {
-					loginInfo.setNumber(Integer.parseInt(user));
-		        }
-		        else {
+			if(password != null && password.matches("[-+]?\\d*\\.?\\d+")) {
+				try{
+				    int i = Integer.parseInt(password);  
 		        	loginInfo = new LoginInfo();
 					loginInfo.setStatus("atm");
+					String driver ="com.mysql.cj.jdbc.Driver";
+		        	String server = "localhost:3306";
+		            String database = "banco";
+		            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
 		            connection = DriverManager.getConnection(uriConnection, "atm", "atm");
+					Statement stmt = connection.createStatement();
 		            stmt = connection.createStatement();
-			        rs = stmt.executeQuery("select nro_tarjeta from Tarjeta where "+user+" = nro_tarjeta and md5("+password+") = pin;");
+			        ResultSet rs = stmt.executeQuery("select nro_tarjeta from Tarjeta where "+user+" = nro_tarjeta and md5("+password+") = pin;");
 			        if(rs != null && rs.next()) {
 						loginInfo.setNumber(Integer.parseInt(user));
 			        }
 			        else loginInfo = null;
-		        }
-	         }
-	         catch (SQLException ex){
-	            JOptionPane.showMessageDialog(w,
-	                                           "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-	                                           "Error",
-	                                           JOptionPane.ERROR_MESSAGE);
-	            System.out.println("SQLException: " + ex.getMessage());
-	            System.out.println("SQLState: " + ex.getSQLState());
-	            System.out.println("VendorError: " + ex.getErrorCode());
-	            loginInfo = null;
-	         }
-			return loginInfo;
+				}
+				catch (SQLException ex){
+		            JOptionPane.showMessageDialog(w,
+		                                           "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+		                                           "Error",
+		                                           JOptionPane.ERROR_MESSAGE);
+		            System.out.println("SQLException: " + ex.getMessage());
+		            System.out.println("SQLState: " + ex.getSQLState());
+		            System.out.println("VendorError: " + ex.getErrorCode());
+		            loginInfo = null;
+		         }
+			}
+			else {
+				try {
+					loginInfo = new LoginInfo();
+					loginInfo.setStatus("empleado");
+					String driver ="com.mysql.cj.jdbc.Driver";
+		        	String server = "localhost:3306";
+		            String database = "banco";
+		            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
+		            connection = DriverManager.getConnection(uriConnection, "empleado", "empleado");
+					Statement stmt = connection.createStatement();
+					
+			        ResultSet rs = stmt.executeQuery("select legajo from empleado where legajo="+user+" and password=md5('"+password+"');");
+			        if(rs != null && rs.next()) {
+						loginInfo.setNumber(Integer.parseInt(user));
+			        }
+			        else loginInfo = null;
+				}
+		         catch (SQLException ex){
+		            JOptionPane.showMessageDialog(w,
+		                                           "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
+		                                           "Error",
+		                                           JOptionPane.ERROR_MESSAGE);
+		            System.out.println("SQLException: " + ex.getMessage());
+		            System.out.println("SQLState: " + ex.getSQLState());
+		            System.out.println("VendorError: " + ex.getErrorCode());
+		            loginInfo = null;
+		         }
+			}
 		}
+		return loginInfo;
 	}
 	
 	public DefaultTableModel getQuery(String query) throws SQLException{
@@ -323,6 +345,124 @@ public class Connector {
 		return (Character.toString(old.charAt(8))+Character.toString(old.charAt(9))+"/"+
 				Character.toString(old.charAt(5))+Character.toString(old.charAt(6))+"/"+
 				Character.toString(old.charAt(0))+Character.toString(old.charAt(1))+Character.toString(old.charAt(2))+Character.toString(old.charAt(3)));
+	}
+
+
+	public boolean noTienePrestamo(int nroCliente) {
+		// TODO Auto-generated method stub
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+        try {
+        	stmt = connection.createStatement();
+			rs = stmt.executeQuery("select nro_prestamo from prestamo natural join cliente natural join pago where "
+					+ "'"+nroCliente+"' = cliente.nro_cliente and pago.fecha_pago is NULL;");
+			if(rs != null && rs.next()) {
+				return false;
+			}
+			else {
+				System.out.println("retorne true");
+				return true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return false;
+	}
+	
+	public int getNroPrestamo(int nroCliente) {
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+        try {
+        	stmt = connection.createStatement();
+			rs = stmt.executeQuery("select distinct nro_prestamo from pago natural join prestamo natural join cliente where "
+					+ "'"+nroCliente+"' = cliente.nro_cliente and pago.fecha_pago is NULL;");
+			if(rs != null && rs.next())
+				return rs.getInt(1);
+			else
+				return 0;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return 0;
+	}
+	
+	public int getNroCliente(String tipoDoc, String nroDoc) {
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+        try {
+        	stmt = connection.createStatement();
+			rs = stmt.executeQuery("(select nro_cliente from cliente where "
+					+ "'"+tipoDoc+"' = tipo_doc and '"+nroDoc+"' "
+					+ " = nro_doc)");
+			if(rs != null && rs.next()) {
+				int i = rs.getInt(1);
+				return i;
+			}
+			else
+				return 0;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return 0;
+	}
+	
+	public double getInteresPrestamo(double monto, int cantMeses) {
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+        try {
+        	stmt = connection.createStatement();
+			rs = stmt.executeQuery("select tasa from tasa_prestamo where "
+					+ "periodo = "+cantMeses+" and '"+Double.toString(monto)+"' > monto_inf and '"+Double.toString(monto)+"' < monto_sup;");
+			if(rs != null && rs.next())
+				return rs.getInt(1);
+			else
+				return 0;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return 0;
+	}
+	
+	public Vector<Integer> getMesesPosibles() {
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+		Vector<Integer> ret = new Vector<Integer>();
+        try {
+        	stmt = connection.createStatement();
+			rs = stmt.executeQuery("select distinct periodo from tasa_prestamo;");
+			while(rs != null && rs.next())
+				ret.add(rs.getInt(1));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return ret;
+	}
+
+	public void insertarPrestamo(int nroCliente, double monto, Integer cuotas, int legajo) {
+		// TODO Auto-generated method stub
+		java.sql.Statement stmt = null;
+		double tasa = getInteresPrestamo(monto, cuotas);
+		double interes = (monto*tasa*cuotas)/1200;
+        try {
+        	stmt = connection.createStatement();
+			stmt.execute("INSERT INTO Prestamo(nro_cliente,legajo,fecha,cant_meses,monto,tasa_interes,interes,valor_cuota) VALUES "
+					+ "("+Integer.toString(nroCliente)+", "+Integer.toString(legajo)+", curdate(), "+Integer.toString(cuotas)+", "
+					+ "'"+Double.toString(monto)+"', '"+Double.toString(tasa)+"', "+ Double.toString(interes)+", "
+					+ ""+Double.toString((monto+interes)/cuotas)+");");
+			int nroPrestamo = this.getNroPrestamo(nroCliente);
+			for(int i = 0; i<cuotas; i++) {
+				stmt.execute("INSERT INTO Pago(nro_prestamo, nro_pago,fecha_venc,fecha_pago) VALUES ("+Integer.toString(nroPrestamo)+", "
+						+ Integer.toString(i+1)+", DATE_ADD(CURDATE(), INTERVAL "+Integer.toString(i+1)+" MONTH), NULL);");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

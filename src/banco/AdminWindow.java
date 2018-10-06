@@ -107,6 +107,7 @@ public class AdminWindow extends JFrame {
 				// TODO Auto-generated method stub
 				InfoTablesWindow frame = new InfoTablesWindow();
 				frame.setVisible(true);
+				frame.setAlwaysOnTop(true);
 			}
 	        });
      	getContentPane().add(btnInfoTables,c);

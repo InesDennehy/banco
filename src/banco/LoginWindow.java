@@ -194,6 +194,7 @@ public class LoginWindow extends JFrame {
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
 				Connector.getConnection().disconnect(LoginWindow.this);
+				LoginWindow.this.dispatchEvent(new WindowEvent(LoginWindow.this, WindowEvent.WINDOW_CLOSING));
 			}
 		});
 		contentPane.add(btnDesconectar, c);
