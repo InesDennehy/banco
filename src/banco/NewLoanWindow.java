@@ -125,7 +125,7 @@ public class NewLoanWindow extends JDialog{
 					}
 					if(nroCliente != 0 && noTienePrestamo && Double.parseDouble(tfMonto.getText()) < maxMonto) {
 						Connector.getConnection().insertarPrestamo(nroCliente, Double.parseDouble(tfMonto.getText()), (Integer)cuotas.getSelectedItem(), legajo);
-						sw.actualizarPrestamos();
+						sw.actualizarPrestamos("", "");
 						NewLoanWindow.this.dispatchEvent(new WindowEvent(NewLoanWindow.this, WindowEvent.WINDOW_CLOSING));
 					}
 					else if (Double.parseDouble(tfMonto.getText()) > maxMonto) {

@@ -1,6 +1,7 @@
 package banco;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -135,7 +136,7 @@ public class Connector {
     	return null;
 	}
 	
-	public boolean disconnect(LoginWindow w) {
+	public boolean disconnect(JFrame w) {
 		try {
 			if(connection != null)
 				connection.close();

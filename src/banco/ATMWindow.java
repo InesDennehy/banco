@@ -7,18 +7,21 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.SQLException;
-
+import java.awt.event.WindowEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 
 public class ATMWindow extends JFrame{
 	
@@ -36,6 +39,24 @@ public class ATMWindow extends JFrame{
         getContentPane().setBackground(new Color(232, 236, 242));
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
+        JMenuBar menuBar = new JMenuBar();
+        JMenuItem logout = new JMenuItem("Log Out");
+        logout.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Connector.getConnection().disconnect(ATMWindow.this);
+				LoginWindow frame = new LoginWindow();
+				frame.setVisible(true);
+				ATMWindow.this.dispatchEvent(new WindowEvent(ATMWindow.this, WindowEvent.WINDOW_CLOSING));
+			}
+        });
+        logout.setMnemonic('L');
+        JMenu opciones = new JMenu("Opciones");
+        opciones.setMnemonic('O');
+        opciones.add(logout);
+        menuBar.add(opciones);
+        this.setJMenuBar(menuBar);
+        
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = 0;

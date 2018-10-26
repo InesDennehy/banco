@@ -6,19 +6,29 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -29,15 +39,46 @@ import javax.swing.table.TableRowSorter;
 public class StaffWindow extends JFrame {
 	
 	private JTable morosos, prestamos, cuotas;
+	private JCTextField tipo, nro;
+	private JPanel pagos, mor;
 	
 	public StaffWindow(int legajo) {
 		this.setResizable(false);
-		setPreferredSize(new Dimension(800, 600));
-        this.setBounds(0, 0, 800, 600);
+		setPreferredSize(new Dimension(500, 600));
+        this.setBounds(0, 0, 500, 600);
         setVisible(true);
+        mor = new JPanel();
+        pagos = new JPanel();
         this.setTitle("BD Bank - Empleado");
-        getContentPane().setLayout(new GridBagLayout());
-        getContentPane().setBackground(new Color(232, 236, 242));
+        JTabbedPane tp = new JTabbedPane();
+        tp.addTab("Préstamos", null, pagos,
+                "Pago de cuotas y creación de nuevos préstamos");
+        tp.addTab("Morosos", null, mor,
+                "Lista de morosos");
+        this.setContentPane(tp);
+        
+        JMenuBar menuBar = new JMenuBar();
+        JMenuItem logout = new JMenuItem("Log Out");
+        logout.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Connector.getConnection().disconnect(StaffWindow.this);
+				LoginWindow frame = new LoginWindow();
+				frame.setVisible(true);
+				StaffWindow.this.dispatchEvent(new WindowEvent(StaffWindow.this, WindowEvent.WINDOW_CLOSING));
+			}
+        });
+        logout.setMnemonic('L');
+        JMenu opciones = new JMenu("Opciones");
+        opciones.setMnemonic('O');
+        opciones.add(logout);
+        menuBar.add(opciones);
+        this.setJMenuBar(menuBar);
+        
+        mor.setLayout(new GridBagLayout());
+        mor.setBackground(new Color(232, 236, 242));
+        pagos.setLayout(new GridBagLayout());
+        pagos.setBackground(new Color(232, 236, 242));
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         GridBagConstraints c = new GridBagConstraints();
@@ -49,11 +90,11 @@ public class StaffWindow extends JFrame {
         
         JLabel labelMorosos = new JLabel("Clientes Morosos");
         labelMorosos.setFont(LoginWindow.font);
-        getContentPane().add(labelMorosos, c);
+        mor.add(labelMorosos, c);
         
         c.gridy = 1;
         c.ipadx = 450;
-        c.ipady = 400;
+        c.ipady = 480;
         c.weightx = 0;
         c.gridheight = 4;
         morosos = new JTable();
@@ -78,22 +119,65 @@ public class StaffWindow extends JFrame {
 			});
 		JScrollPane sp = new JScrollPane(morosos);
 		sp.setBackground(new Color(232, 236, 242));
-		getContentPane().add(sp, c);
+		mor.add(sp, c);
         
         c.gridx = 1;
         c.gridy = 0;
         c.ipadx = 0;
         c.ipady = 0;
         c.gridheight = 1;
+        c.gridwidth = 2;
         
         JLabel p = new JLabel("Prestamos a pagar");
         p.setFont(LoginWindow.font);
-        getContentPane().add(p, c);
+        pagos.add(p, c);
         
         c.gridy = 1;
-        c.gridheight = 4;
+        c.gridwidth = 1;
+        c.weightx = 0.5;
+        c.insets = new Insets(5,5,5,2);
+        tipo = new JCTextField();
+        tipo.setPlaceholder("tipo doc");
+        nro = new JCTextField();
+        nro.setPlaceholder("nro doc");
+        tipo.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+               actualizarPrestamos(tipo.getText(), nro.getText());
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+            	actualizarPrestamos(tipo.getText(), nro.getText());
+            }
+            @Override
+            public void changedUpdate(DocumentEvent de) {}
+        });
+        nro.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+               actualizarPrestamos(tipo.getText(), nro.getText());
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+            	actualizarPrestamos(tipo.getText(), nro.getText());
+            }
+            @Override
+            public void changedUpdate(DocumentEvent de) {}
+
+        });
+        pagos.add(tipo, c);
+        c.gridx = 2;
+        c.insets = new Insets(5,2,5,5);
+        pagos.add(nro, c);
+        
+        c.gridy = 2;
+        c.gridx = 1;
+        c.gridheight = 3;
+        c.gridwidth = 2;
+        c.weightx = 1;
         c.ipadx = 0;
-        c.ipady = 400;
+        c.ipady = 350;
+        c.insets = new Insets(0,5,0,5);
         prestamos = new JTable();
         prestamos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
 			@Override
@@ -112,7 +196,7 @@ public class StaffWindow extends JFrame {
 		   }
 			
 		});
-        actualizarPrestamos();
+        actualizarPrestamos("", "");
         ListSelectionModel listSelectionModel = prestamos.getSelectionModel();
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -121,16 +205,17 @@ public class StaffWindow extends JFrame {
 	        	actualizarCuotas();
 			}
         });
-        getContentPane().add(new JScrollPane(prestamos), c);
+        pagos.add(new JScrollPane(prestamos), c);
         
-        c.gridx = 2;
+        c.gridx = 3;
         c.gridy = 0;
         c.ipadx = 0;
         c.ipady = 0;
         c.insets = new Insets(5,5,5,5);
         c.gridheight = 2;
+        c.gridwidth = 1;
         CustomButton np = new CustomButton("NUEVO PRESTAMO", 150, 30, "normal");
-        getContentPane().add(np, c);
+        pagos.add(np, c);
         np.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {}
@@ -157,11 +242,11 @@ public class StaffWindow extends JFrame {
         cu.setFont(LoginWindow.font);
         cu.setHorizontalAlignment(JLabel.CENTER);
         cu.setHorizontalTextPosition(JLabel.CENTER);
-        getContentPane().add(cu, c);;
+        pagos.add(cu, c);;
         
         c.gridy = 3;
         c.ipadx = 0;
-        c.ipady = 400;
+        c.ipady = 380;
         cuotas = new JTable();
         c.insets = new Insets(5,5,5,5);
         cuotas.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
@@ -181,7 +266,7 @@ public class StaffWindow extends JFrame {
 		   }
 			
 		});
-        getContentPane().add(new JScrollPane(cuotas), c);
+        pagos.add(new JScrollPane(cuotas), c);
         
         c.gridy = 4;
         c.ipadx = 0;
@@ -216,18 +301,52 @@ public class StaffWindow extends JFrame {
 				}
 			}
         });
-        getContentPane().add(pagar, c);
+        pagos.add(pagar, c);
         
 	}
 	
-	public void actualizarPrestamos() {
-		 try {
+	public void actualizarPrestamos(String tipo, String nro) {
+		 if(tipo.equals("") && nro.equals("")) {
+			try {
 				prestamos.setModel(Connector.getConnection().getQuery("select tipo_doc, nro_doc from prestamo a natural join cliente where exists "
 						+ "(select nro_pago from pago b where a.nro_prestamo = b.nro_prestamo and fecha_pago is NULL)"));
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		else { 
+			if(nro.equals("")) {
+				try {
+					prestamos.setModel(Connector.getConnection().getQuery("select tipo_doc, nro_doc from prestamo a natural join cliente where exists "
+						+ "(select nro_pago from pago b where a.nro_prestamo = b.nro_prestamo and fecha_pago is NULL) and tipo_doc like '"+tipo+"%';"));
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				if(tipo.equals("")) {
+					try {
+						prestamos.setModel(Connector.getConnection().getQuery("select tipo_doc, nro_doc from prestamo a natural join cliente where exists "
+							+ "(select nro_pago from pago b where a.nro_prestamo = b.nro_prestamo and fecha_pago is NULL) and nro_doc like '"+nro+"%';"));
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				else { //hay tipo y nro
+					try {
+						prestamos.setModel(Connector.getConnection().getQuery("select tipo_doc, nro_doc from prestamo a natural join cliente where exists "
+							+ "(select nro_pago from pago b where a.nro_prestamo = b.nro_prestamo and fecha_pago is NULL) and nro_doc like '"+nro+"%' and "
+							+ "tipo_doc like '"+tipo+"%';"));
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+			 
 	}
 	private void actualizarCuotas() {
 		try {
@@ -239,7 +358,7 @@ public class StaffWindow extends JFrame {
 				actualizarMorosos();
 			}
 			if(cuotas.getRowCount() == 0) {
-				actualizarPrestamos();
+				actualizarPrestamos("", "");
 			}
 			
 		} catch (SQLException e1) {
