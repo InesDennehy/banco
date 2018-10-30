@@ -26,7 +26,7 @@ public class Connector {
 		return connector;
 	}
 	
-	public LoginInfo login(LoginWindow w, String user, String password) {
+	public LoginInfo AdminLogin(LoginWindow w, String user, String password) {
 		LoginInfo loginInfo = null;
 		if(user.equals("admin") && password.equals("admin")) {
 			try{
@@ -50,64 +50,59 @@ public class Connector {
 	         }
 			return loginInfo;
 		}
-		else {
-			if(password != null && password.matches("[-+]?\\d*\\.?\\d+")) {
-				try{
-				    int i = Integer.parseInt(password);  
-		        	loginInfo = new LoginInfo();
-					loginInfo.setStatus("atm");
-					String driver ="com.mysql.cj.jdbc.Driver";
-		        	String server = "localhost:3306";
-		            String database = "banco";
-		            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
-		            connection = DriverManager.getConnection(uriConnection, "atm", "atm");
-					Statement stmt = connection.createStatement();
-		            stmt = connection.createStatement();
-			        ResultSet rs = stmt.executeQuery("select nro_tarjeta from Tarjeta where "+user+" = nro_tarjeta and md5("+password+") = pin;");
-			        if(rs != null && rs.next()) {
-						loginInfo.setNumber(Integer.parseInt(user));
-			        }
-			        else loginInfo = null;
-				}
-				catch (SQLException ex){
-		            JOptionPane.showMessageDialog(w,
-		                                           "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-		                                           "Error",
-		                                           JOptionPane.ERROR_MESSAGE);
-		            System.out.println("SQLException: " + ex.getMessage());
-		            System.out.println("SQLState: " + ex.getSQLState());
-		            System.out.println("VendorError: " + ex.getErrorCode());
-		            loginInfo = null;
-		         }
-			}
-			else {
-				try {
-					loginInfo = new LoginInfo();
-					loginInfo.setStatus("empleado");
-					String driver ="com.mysql.cj.jdbc.Driver";
-		        	String server = "localhost:3306";
-		            String database = "banco";
-		            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
-		            connection = DriverManager.getConnection(uriConnection, "empleado", "empleado");
-					Statement stmt = connection.createStatement();
-					
-			        ResultSet rs = stmt.executeQuery("select legajo from empleado where legajo="+user+" and password=md5('"+password+"');");
-			        if(rs != null && rs.next()) {
-						loginInfo.setNumber(Integer.parseInt(user));
-			        }
-			        else loginInfo = null;
-				}
-		         catch (SQLException ex){
-		            JOptionPane.showMessageDialog(w,
-		                                           "Se produjo un error al intentar conectarse a la base de datos.\n" + ex.getMessage(),
-		                                           "Error",
-		                                           JOptionPane.ERROR_MESSAGE);
-		            System.out.println("SQLException: " + ex.getMessage());
-		            System.out.println("SQLState: " + ex.getSQLState());
-		            System.out.println("VendorError: " + ex.getErrorCode());
-		            loginInfo = null;
-		         }
-			}
+		
+		return loginInfo;
+	}
+	public LoginInfo StaffLogin(LoginWindow w, String user, String password) {
+		LoginInfo loginInfo = null;
+		try {
+			loginInfo = new LoginInfo();
+			loginInfo.setStatus("empleado");
+			String driver ="com.mysql.cj.jdbc.Driver";
+        	String server = "localhost:3306";
+            String database = "banco";
+            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
+            connection = DriverManager.getConnection(uriConnection, "empleado", "empleado");
+			Statement stmt = connection.createStatement();
+			
+	        ResultSet rs = stmt.executeQuery("select legajo from empleado where legajo="+user+" and password=md5('"+password+"');");
+	        if(rs != null && rs.next()) {
+				loginInfo.setNumber(Integer.parseInt(user));
+	        }
+	        else loginInfo = null;
+		}
+         catch (SQLException ex){
+            loginInfo = null;
+         }
+		catch(NumberFormatException ex) {
+			loginInfo = null;
+		}
+		return loginInfo;
+	}
+	public LoginInfo ATMLogin(LoginWindow w, String user, String password) {
+		LoginInfo loginInfo = null;
+		try{
+		    int i = Integer.parseInt(password);  
+        	loginInfo = new LoginInfo();
+			loginInfo.setStatus("atm");
+			String driver ="com.mysql.cj.jdbc.Driver";
+        	String server = "localhost:3306";
+            String database = "banco";
+            String uriConnection = "jdbc:mysql://" + server + "/" + database +"?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true";
+            connection = DriverManager.getConnection(uriConnection, "atm", "atm");
+			Statement stmt = connection.createStatement();
+            stmt = connection.createStatement();
+	        ResultSet rs = stmt.executeQuery("select nro_tarjeta from Tarjeta where "+user+" = nro_tarjeta and md5("+password+") = pin;");
+	        if(rs != null && rs.next()) {
+				loginInfo.setNumber(Integer.parseInt(user));
+	        }
+	        else loginInfo = null;
+		}
+		catch (SQLException ex){
+            loginInfo = null;
+         }
+		catch(NumberFormatException ex) {
+			loginInfo = null;
 		}
 		return loginInfo;
 	}
@@ -133,6 +128,26 @@ public class Connector {
 			stmt.execute(query);
 			stmt.close();
     	}
+    	return null;
+	}
+	
+	public String doTransaction(String transaction, String query) {
+		java.sql.Statement stmt = null;
+		ResultSet rs = null;
+    	try {
+	        stmt = connection.createStatement();
+			stmt.execute(transaction);
+			rs = stmt.executeQuery(query);
+			String s = null;
+			if(rs!=null && rs.next()) {
+				s =  rs.getString(1);
+			}
+			stmt.close();
+			return s;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	return null;
 	}
 	
@@ -203,7 +218,7 @@ public class Connector {
 	    }
 	}
 
-	public int getSaldoTarjeta(long tarjeta) {
+	public Double getSaldoTarjeta(long tarjeta) {
 		// TODO Auto-generated method stub
 		java.sql.Statement stmt = null;
 	    String query = "select saldo from tarjeta natural join trans_cajas_ahorro where nro_tarjeta = "+Long.toString(tarjeta);
@@ -211,7 +226,7 @@ public class Connector {
 	        stmt = connection.createStatement();
 	        ResultSet rs = stmt.executeQuery(query);
 	        if (rs != null && rs.next()) {
-	        	return rs.getInt(1);
+	        	return rs.getDouble(1);
 	        }
 	    } catch (SQLException e ) {
 	        e.printStackTrace();
@@ -223,7 +238,7 @@ public class Connector {
 				e.printStackTrace();
 			} }
 	    }
-		return 0;
+		return 0.00;
 	}
 
 	public int getCuenta(long tarjeta) {
@@ -348,7 +363,6 @@ public class Connector {
 				Character.toString(old.charAt(0))+Character.toString(old.charAt(1))+Character.toString(old.charAt(2))+Character.toString(old.charAt(3)));
 	}
 
-
 	public boolean noTienePrestamo(int nroCliente) {
 		// TODO Auto-generated method stub
 		java.sql.Statement stmt = null;
@@ -472,12 +486,6 @@ public class Connector {
 					+ "'"+Double.toString(monto)+"', '"+Double.toString(tasa)+"', "+ Double.toString(interes)+", "
 					+ ""+Double.toString((monto+interes)/cuotas)+");");
 			stmt.close();
-			stmt = connection.createStatement();
-			int nroPrestamo = this.getPrestamo(nroCliente);
-			for(int i = 0; i<cuotas; i++) {
-				stmt.execute("INSERT INTO Pago(nro_prestamo, nro_pago,fecha_venc,fecha_pago) VALUES ("+Integer.toString(nroPrestamo)+", "
-						+ Integer.toString(i+1)+", DATE_ADD(CURDATE(), INTERVAL "+Integer.toString(i+1)+" MONTH), NULL);");
-			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

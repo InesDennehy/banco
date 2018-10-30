@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import javax.swing.BorderFactory;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
@@ -28,6 +29,7 @@ public class LoginWindow extends JFrame {
 	private CustomButton btnDesconectar;
 	private GridBagConstraints c;
 	private JLabel errorMessage;
+	private JComboBox<String> tipo;
 	public static Font font = new Font("Segan-Light", Font.PLAIN, 14);
 	public static Font font2 = new Font("Segan-Light", Font.PLAIN, 12);
 
@@ -65,17 +67,32 @@ public class LoginWindow extends JFrame {
 		c.gridx = 0;
 		c.gridy = 0;
 		c.fill = GridBagConstraints.BOTH;
-		c.ipadx = 30;
-		c.ipady = 5;
+		c.ipadx = 0;
+		c.ipady = 0;
 		c.weighty = 1;
-		c.gridwidth = 2;
+		c.weightx = 0.5;
+		c.gridwidth = 1;
 		c.insets = new Insets(0,15,0,15);
 		JLabel lblLogin = new JLabel("BD Bank - Login");
 		lblLogin.setFont(font);
 		contentPane.add(lblLogin, c);
 		
+		c.gridx = 1;
+		c.weighty = 0;
+		c.fill = GridBagConstraints.NONE;
+		c.insets = new Insets(0,0,0,0);
+		String[] t = {"ATM", "Empleado", "Admin"}; 
+		tipo = new JComboBox<String>(t);
+		tipo.setFont(LoginWindow.font);
+		contentPane.add(tipo, c);
+
+		c.gridwidth = 2;
+		c.gridx = 0;
 		c.gridy = 1;
 		c.ipady = 0;
+		c.weighty = 1;
+		c.weightx = 1;
+		c.fill = GridBagConstraints.BOTH;
 		c.insets = new Insets(5,10,5,5);
 		
 		tfUser = new JCTextField();
@@ -121,56 +138,87 @@ public class LoginWindow extends JFrame {
 			public void mousePressed(MouseEvent arg0) {}
 			@Override
 			public void mouseReleased(MouseEvent arg0) {
-				LoginInfo info = Connector.getConnection().login(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
-				if(info != null && info.getStatus() == "admin") {
-					try {
-						AdminWindow frame = new AdminWindow();
-						frame.setVisible(true);
-						errorMessage.setText("");
-						LoginWindow.this.setBounds(100, 100, 300, 220);
-						tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-						tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-						LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
-					} catch (Exception e) {
-						e.printStackTrace();
+				if(tipo.getSelectedItem().equals("Admin")) {
+					LoginInfo info = Connector.getConnection().AdminLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
+					if(info != null) {
+						try {
+							AdminWindow frame = new AdminWindow();
+							frame.setVisible(true);
+							errorMessage.setText("");
+							LoginWindow.this.setBounds(100, 100, 300, 220);
+							tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+							tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+							LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-				}
-				else if(info != null && info.getStatus() == "atm") {
-					try {
-						ATMWindow frame = new ATMWindow(info.getNumber());
-						frame.setVisible(true);
-						errorMessage.setText("");
-						LoginWindow.this.setBounds(100, 100, 300, 220);
-						tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-						tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-						LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}else if(info != null && info.getStatus() == "empleado") {
-					try {
-						StaffWindow frame = new StaffWindow((int)info.getNumber());
-						frame.setVisible(true);
-						errorMessage.setText("");
-						LoginWindow.this.setBounds(100, 100, 300, 220);
-						tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-						tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
-						LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				else {
-					LoginWindow.this.setBounds(100, 100, 300, 260);
-					StringBuilder sb = new StringBuilder(64);
-	                sb.append("<html>El usuario o contraseña ingresados no son correctos, por favor inténtelo de nuevo</html>");
+					else {
+						LoginWindow.this.setBounds(100, 100, 300, 260);
+						StringBuilder sb = new StringBuilder(64);
+		                sb.append("<html>El usuario o contraseña ingresados no son correctos, por favor inténtelo de nuevo</html>");
 
-	                errorMessage.setText(sb.toString());
-					errorMessage.setBounds(100, 100, 300, 50);
-					tfUser.setBorder(BorderFactory.createCompoundBorder(
-							BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
-					tfPassword.setBorder(BorderFactory.createCompoundBorder(
-							BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+		                errorMessage.setText(sb.toString());
+						errorMessage.setBounds(100, 100, 300, 50);
+						tfUser.setBorder(BorderFactory.createCompoundBorder(
+								BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+						tfPassword.setBorder(BorderFactory.createCompoundBorder(
+								BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+					}
+				} else if(tipo.getSelectedItem().equals("ATM")) {
+					LoginInfo info = Connector.getConnection().ATMLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
+					if(info != null) {
+						try {
+							ATMWindow frame = new ATMWindow(info.getNumber());
+							frame.setVisible(true);
+							errorMessage.setText("");
+							LoginWindow.this.setBounds(100, 100, 300, 220);
+							tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+							tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+							LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					else {
+						LoginWindow.this.setBounds(100, 100, 300, 260);
+						StringBuilder sb = new StringBuilder(64);
+		                sb.append("<html>El usuario o contraseña ingresados no son correctos, por favor inténtelo de nuevo</html>");
+
+		                errorMessage.setText(sb.toString());
+						errorMessage.setBounds(100, 100, 300, 50);
+						tfUser.setBorder(BorderFactory.createCompoundBorder(
+								BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+						tfPassword.setBorder(BorderFactory.createCompoundBorder(
+								BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+					}
+				} else if(tipo.getSelectedItem().equals("Empleado")) {
+					LoginInfo info = Connector.getConnection().StaffLogin(LoginWindow.this ,tfUser.getText(), tfPassword.getText());
+					if(info != null) {
+						try {
+							StaffWindow frame = new StaffWindow((int)info.getNumber());
+							frame.setVisible(true);
+							errorMessage.setText("");
+							LoginWindow.this.setBounds(100, 100, 300, 220);
+							tfUser.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+							tfPassword.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 0));
+							LoginWindow.this.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));;
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					else {
+						LoginWindow.this.setBounds(100, 100, 300, 260);
+						StringBuilder sb = new StringBuilder(64);
+		                sb.append("<html>El usuario o contraseña ingresados no son correctos, por favor inténtelo de nuevo</html>");
+
+		                errorMessage.setText(sb.toString());
+						errorMessage.setBounds(100, 100, 300, 50);
+						tfUser.setBorder(BorderFactory.createCompoundBorder(
+								BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+						tfPassword.setBorder(BorderFactory.createCompoundBorder(
+								BorderFactory.createLineBorder(new Color(214, 65, 57)), BorderFactory.createEmptyBorder(0, 5, 0, 0)));
+					}
 				}
 				
 			}

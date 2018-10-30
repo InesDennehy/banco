@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -44,8 +45,8 @@ public class StaffWindow extends JFrame {
 	
 	public StaffWindow(int legajo) {
 		this.setResizable(false);
-		setPreferredSize(new Dimension(500, 600));
-        this.setBounds(0, 0, 500, 600);
+		setPreferredSize(new Dimension(500, 620));
+        this.setBounds(0, 0, 500, 620);
         setVisible(true);
         mor = new JPanel();
         pagos = new JPanel();
@@ -53,8 +54,11 @@ public class StaffWindow extends JFrame {
         JTabbedPane tp = new JTabbedPane();
         tp.addTab("Préstamos", null, pagos,
                 "Pago de cuotas y creación de nuevos préstamos");
+        tp.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        tp.setMnemonicAt(0, KeyEvent.VK_P);
         tp.addTab("Morosos", null, mor,
                 "Lista de morosos");
+        tp.setMnemonicAt(1, KeyEvent.VK_M);
         this.setContentPane(tp);
         
         JMenuBar menuBar = new JMenuBar();
@@ -124,7 +128,7 @@ public class StaffWindow extends JFrame {
         c.gridx = 1;
         c.gridy = 0;
         c.ipadx = 0;
-        c.ipady = 0;
+        c.ipady = 2;
         c.gridheight = 1;
         c.gridwidth = 2;
         
@@ -133,6 +137,7 @@ public class StaffWindow extends JFrame {
         pagos.add(p, c);
         
         c.gridy = 1;
+        c.ipady = 0;
         c.gridwidth = 1;
         c.weightx = 0.5;
         c.insets = new Insets(5,5,5,2);
@@ -176,7 +181,7 @@ public class StaffWindow extends JFrame {
         c.gridwidth = 2;
         c.weightx = 1;
         c.ipadx = 0;
-        c.ipady = 350;
+        c.ipady = 330;
         c.insets = new Insets(0,5,0,5);
         prestamos = new JTable();
         prestamos.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
